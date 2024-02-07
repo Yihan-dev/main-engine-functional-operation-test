@@ -6,8 +6,12 @@
     <link rel="stylesheet" href="script\Style.css">
   </head>
   <body>
-    <canvas id="sub_canvas" width='1000px' height='1000px'></canvas>
-    <canvas id="canvas" width='1000px' height='1000px'></canvas>
+    <div class="버튼" id="명령처리">명령처리</div>
+    <div class="버튼" id="타일정보">타일정보:</div>
+    <div id="stage">
+      <canvas class="layer" id="unit-layer" width='1000px' height='1000px'></canvas>
+      <canvas class="layer" id="tile-layer" width='1000px' height='1000px'></canvas>
+    </div>
     <script type="module" src="script\main.js"></script>
   </body>
 </html>

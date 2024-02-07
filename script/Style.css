@@ -1,14 +1,21 @@
-#sub_canvas {
-  height: 0px;
-  width: 0px;
-  display: block;
+#unit-layer {
+  z-index: 2;
 }
-#canvas {
+#tile-layer {
+  z-index: 1;
+}
+#stage {
   background-color: rgb(35, 35, 35);
   color: rgb(228, 226, 226);
-  height: 100vh;
-  width: 100vh;
-  display: block;
+  position: fixed;
+}
+.버튼 {
+  position: fixed;
+  z-index: 3;
+}
+
+.layer {
+  position: absolute;
 }
 
 body {

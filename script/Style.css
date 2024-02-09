@@ -1,23 +1,11 @@
-#plan-layer {
-  z-index: 3;
-}
-#unit-layer {
-  z-index: 2;
-}
-#tile-layer {
+#canvas {
   z-index: 1;
+  display: block;
 }
 .버튼 {
   position: fixed;
   z-index: 10;
   user-select: none;
-}
-#stage {
-  position: fixed;
-}
-
-.layer {
-  position: absolute;
 }
 
 body {

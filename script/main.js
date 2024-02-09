@@ -1,38 +1,45 @@
 // 저작권 및 라이센스 표시 공간
 import * as view_model from "./view-model.js";
 
-const stage = document.getElementById('stage');
-const plan_canvas = document.getElementById('plan-layer');
-const tile_canvas = document.getElementById('tile-layer');
-const unit_canvas = document.getElementById('unit-layer');
+const plan_canvas = document.createElement('canvas');
 const plan_ctx = plan_canvas.getContext("2d");
-const tile_ctx = tile_canvas.getContext("2d");
+plan_canvas.width = 100;
+plan_canvas.height = 100;
+
+const unit_canvas = document.createElement('canvas');
 const unit_ctx = unit_canvas.getContext("2d");
+unit_canvas.width = 100;
+unit_canvas.height = 100;
 
-const 화면타일지름 = 40;
-const 화면타일반지름 = 화면타일지름 / 2;
+const tile_canvas = document.createElement('canvas');
+const tile_ctx = tile_canvas.getContext("2d");
+tile_canvas.width = 100;
+tile_canvas.height = 100;
+tile_ctx.fillStyle = '#959595';
+tile_ctx.fillRect(0, 0, 40, 40);
 
-class 좌표 {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-  x = 0;
-  y = 0;
-}
+const offscreen_canvas = document.createElement("canvas");
+const offscreen_ctx = offscreen_canvas.getContext("2d");
+offscreen_canvas.height = 100;
+offscreen_canvas.width = 100;
+offscreen_ctx.drawImage(plan_canvas, 0, 0);
+offscreen_ctx.drawImage(unit_canvas, 0, 0);
+offscreen_ctx.drawImage(tile_canvas, 0, 0);
 
-let 기준캔버스좌표 = new 좌표(0, 0);
-let 이동캔버스좌표 = new 좌표(0, 0);
-let 휠클릭좌표 = new 좌표(0, 0);
-let 마우스좌표 = new 좌표(0, 0);
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext("2d");
+const 타일지름 = 40;
+const 타일반지름 = 타일지름 / 2;
+
+let 기준X = 0;
+let 기준Y = 0;
+let 이동X = 0;
+let 이동Y = 0;
+let 휠클릭X = 0;
+let 휠클릭Y = 0;
+let 마우스X = 0;
+let 마우스Y = 0;
 let 휠클릭 = false;
-plan_canvas.width = 10000;
-tile_canvas.width = 10000;
-unit_canvas.width = 10000;
-plan_canvas.height = 10000;
-tile_canvas.height = 10000;
-unit_canvas.height = 10000;
-tile_ctx.drawImage(view_model.화면반환(), 0, 0);
 
 view_model.데이터불러오기( [
   // X, Y,
@@ -49,6 +56,12 @@ view_model.데이터불러오기( [
 
   // {비활성화_유닛키},
 ] );
+resize();
+
+function 출력() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(offscreen_canvas, 이동X, 이동Y);
+}
 
 function mousedown(event) {
   switch (event.button) {
@@ -57,7 +70,8 @@ function mousedown(event) {
 
     case 1: // 휠클릭
       // console.log(event.offsetX, event.offsetY)
-      휠클릭좌표 = new 좌표(event.clientX, event.clientY);
+      휠클릭X = event.clientX;
+      휠클릭Y = event.clientY;
       휠클릭 = true;
       break;
 
@@ -73,7 +87,8 @@ function mouseup(event) {
     case 1: // 휠클릭
       if (휠클릭) {
         휠클릭 = false;
-        기준캔버스좌표 = new 좌표(이동캔버스좌표.x, 이동캔버스좌표.y);
+        기준X = 이동X;
+        기준Y = 이동Y;
       }
       break;
 
@@ -82,17 +97,18 @@ function mouseup(event) {
   }
 }
 function mousemove(event) {
-  마우스좌표 = new 좌표(event.clientX, event.clientY);
+  마우스X = event.clientX;
+  마우스Y = event.clientY;
 
-  if (event.target.id == 'plan-layer') {
-    const 좌표Y위치 = Math.floor( event.offsetY / 화면타일지름 );
-    const 좌표X위치 = Math.floor( ( event.offsetX - ( (좌표Y위치 & 1) * 화면타일반지름 ) ) / 화면타일지름 );
+  if (event.target.id == 'canvas') {
+    const 좌표Y위치 = Math.floor( 마우스Y / 타일지름 );
+    const 좌표X위치 = Math.floor( ( 마우스X - ( (좌표Y위치 & 1) * 타일반지름 ) ) / 타일지름 );
   }
 
   if (휠클릭) {
-    이동캔버스좌표.x = 기준캔버스좌표.x - 휠클릭좌표.x + 마우스좌표.x;
-    이동캔버스좌표.y = 기준캔버스좌표.y - 휠클릭좌표.y + 마우스좌표.y;
-    stage.style.transform = `translate(${이동캔버스좌표.x}px, ${이동캔버스좌표.y}px)`;
+    이동X = 기준X - 휠클릭X + 마우스X;
+    이동Y = 기준Y - 휠클릭Y + 마우스Y;
+    출력();
   }
 }
 function contextmenu(event) {
@@ -100,7 +116,7 @@ function contextmenu(event) {
 }
 function wheel(event) {
   // 출력크기비율 += event.deltaY * 0.001;
-  // stage.style.transform = `scale(${출력크기비율}) translate(${이동캔버스좌표.x}px, ${이동캔버스좌표.y}px)`;
+  // 출력();
 }
 
 const key_data = {
@@ -120,7 +136,9 @@ function keyup(event) {
 }
 
 function resize(event) {
-  
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  출력();
 }
 
 addEventListener("mousedown", mousedown);

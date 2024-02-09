@@ -2,10 +2,22 @@
   z-index: 1;
   display: block;
 }
-.버튼 {
+.버튼{
+  top: 1vh;
+  right: 10vw;
+  padding: 0.2rem 1rem 0.2rem 1rem;
+  border: 2px solid;
+  background-color: rgb(33, 33, 33);
+  border-radius: 5px;
+  font-size: 2rem;
   position: fixed;
   z-index: 10;
   user-select: none;
+}
+.버튼:hover {
+  color: rgb(213, 254, 255);
+  background-color: rgb(40, 40, 40);
+  transition-duration: 0.3s;
 }
 
 body {

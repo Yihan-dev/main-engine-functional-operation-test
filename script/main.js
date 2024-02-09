@@ -21,30 +21,8 @@ const ctx = canvas.getContext("2d");
 
 let 클릭 = new 순서쌍(0, 0);
 let 마우스 = new 순서쌍(0, 0);
+let 이동 = new 순서쌍(0, 0);
 let 좌표중심 = new 순서쌍(0, 0);
-
-// get 상대() {
-//   return new 순서쌍(
-//     마우스.X - this.기준.X,
-//     마우스.Y - this.기준.Y
-//   ); // 추후수정필수
-// }
-
-view_model.데이터불러오기( [
-  // X, Y,
-  // [타일_높이],
-
-  // [유닛_타일],
-
-  // [유닛_체력],
-  // [유닛_공격력],
-
-  // [유닛_사거리],
-  // [유닛_시야거리],
-  // [유닛_높이],
-
-  // {비활성화_유닛키},
-] );
 
 resize();
 
@@ -55,10 +33,7 @@ function resize(event) {
 }
 function 출력() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(view_model.화면(),
-    좌표중심.X - 클릭.X + 마우스.X,
-    좌표중심.Y - 클릭.Y + 마우스.Y
-  );
+  ctx.drawImage(view_model.화면반환(), 이동.X, 이동.Y);
 }
 
 const mouse_data = {
@@ -71,6 +46,9 @@ function mousedown(event) {
   switch (event.button) {
     case 0:
       mouse_data.left = true;
+      if (event.target.id == 'canvas') {
+        view_model.타일클릭(마우스.X - 이동.X, 마우스.Y - 이동.Y);
+      }
       break;
 
     case 1:
@@ -103,8 +81,11 @@ function mouseup(event) {
 }
 function mousemove(event) {
   마우스.변경(event.clientX, event.clientY);
-
   if (mouse_data.wheel) {
+    이동.변경(
+      좌표중심.X - 클릭.X + 마우스.X,
+      좌표중심.Y - 클릭.Y + 마우스.Y
+    );
     출력();
   }
 }
@@ -140,3 +121,5 @@ addEventListener("wheel", wheel);
 addEventListener("keydown", keydown);
 addEventListener("keyup", keyup);
 addEventListener("resize", resize);
+
+document.getElementById("지형변경").addEventListener('click', e => {view_model.지형변경클릭(e); 출력()});
